@@ -2,7 +2,7 @@
 import { printSchemaWithDirectives } from 'graphql-tools';
 import { GraphQLSchema, parse, visit, InputValueDefinitionNode } from 'graphql';
 // TYPES
-import { INodes } from '../../types/index';
+import { INodes, isNamed } from '../../types/index';
 // CONSTANTS
 import { DIRECTIVE_NAME } from '../../utils/constants';
 
@@ -36,21 +36,25 @@ const schemaHandler = (schema: GraphQLSchema, onlyWithConstrain?: Boolean, exclu
                         }
                     })
                 }
-                if (excludeSuffix && excludeSuffix.some(suffix => node.name.value.endsWith(suffix))) hasConstraint = false;
+                if (excludeSuffix && excludeSuffix.some(suffix => node.name.value === suffix || node.name.value.endsWith(suffix))) hasConstraint = false;
                 if (hasConstraint) nodes.push({ name: node.name.value, fields: [...node.fields!] })
             },
         }
     });
 
+    const tryPush = (node:INodes) => !sortedNodes.find(x => x.name === node.name) && sortedNodes.push(node);
     const depTree = (node:INodes) => {
         node.fields.forEach(field => {
-            const dep = nodes.find(x => x.name === field.name.value)
-            if (dep) {
-                depTree(dep)
-                sortedNodes.push(dep);
+            const type = field.type;
+            if (isNamed(type)) {
+                const dep = nodes.find(x => x.name === type.name.value)
+                if (dep) {
+                    depTree(dep)
+                    tryPush(dep);
+                }
             }
         })
-        sortedNodes.push(node);
+        tryPush(node);
     }
     nodes.forEach(node => depTree(node));
     return sortedNodes;
