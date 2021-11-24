@@ -31,7 +31,7 @@ const fieldNamedTypeHandler = (type: string) => {
     
     else {
         // Assume enum?
-        result = result + `mixed<${type}>().oneOf(Object.values(${type}))`
+        result = result + `mixed<graph.${type}>().oneOf(Object.values(graph.${type}))`
     }
 
     return result
