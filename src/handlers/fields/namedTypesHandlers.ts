@@ -1,5 +1,5 @@
 // UTILS
-import { isRef, isBoolean, isString, isNumber } from '../../utils/typesCheckers';
+import { isRef, isBoolean, isString, isNumber, isDate } from '../../utils/typesCheckers';
 
 /**
  * This functions handle primitives types and references 
@@ -23,6 +23,15 @@ const fieldNamedTypeHandler = (type: string) => {
 
     else if (isNumber(type)) {
         result = result + 'number()'
+    }
+    
+    else if (isDate(type)) {
+        result = result + 'date()'
+    }
+    
+    else {
+        // Assume enum?
+        result = result + `.mixed<keyof typeof ${type}>().oneOf(Object.values(${type}))`
     }
 
     return result
