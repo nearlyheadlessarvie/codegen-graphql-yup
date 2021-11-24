@@ -31,7 +31,7 @@ const fieldNamedTypeHandler = (type: string) => {
     
     else {
         // Assume enum?
-        result = result + `.mixed<keyof typeof ${type}>().oneOf(Object.values(${type}))`
+        result = result + `mixed<keyof typeof ${type}>().oneOf(Object.values(${type}))`
     }
 
     return result
